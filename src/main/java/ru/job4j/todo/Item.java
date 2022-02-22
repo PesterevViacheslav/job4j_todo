@@ -37,7 +37,8 @@ public class Item {
     /**
      * Method Item. Конструктор
      */
-    public Item() {};
+    public Item() {
+    };
     /**
      * Method getId. Получение id дела
      * @return id дела
@@ -75,11 +76,14 @@ public class Item {
     }
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Item item = (Item) o;
-        return id == item.id &&
-                Objects.equals(description, item.description);
+        return id == item.id && Objects.equals(description, item.description);
     }
     @Override
     public int hashCode() {
@@ -87,11 +91,7 @@ public class Item {
     }
     @Override
     public String toString() {
-        return "Item{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", created=" + created +
-                ", done=" + done +
-                '}';
+        return "Item{" + "id=" + id + ", description='" + description + '\''
+                + ", created=" + created + ", done=" + done + '}';
     }
 }

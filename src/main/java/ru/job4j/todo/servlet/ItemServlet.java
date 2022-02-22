@@ -21,7 +21,7 @@ public class ItemServlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         boolean checkGetAll = ((req.getParameter("all").equals("1")) ? true : false);
         String str = req.getParameter("ids");
-        if(str != null) {
+        if (str != null) {
             int[] arr = Arrays.stream(str.substring(1, str.length() - 1).split(","))
                     .map(String::trim).mapToInt(Integer::parseInt).toArray();
             for (int i : arr) {
@@ -29,24 +29,24 @@ public class ItemServlet extends HttpServlet {
             }
         }
         String res =
-            "<table class=\"table\" id=\"777\">" +
-            "<thead>" +
-            "<tr>" +
-            "<th scope=\"col\">Номер задачи</th>" +
-            "<th scope=\"col\">Название</th>" +
-            "<th scope=\"col\">Дата создания</th>" +
-            "<th scope=\"col\">Статус</th>" +
-            "<th scope=\"col\">Выбрать</th>" +
-            "</tr>" +
-            "</thead>" +
-            "<tbody>";
+            "<table class=\"table\" id=\"777\">"
+            + "<thead>"
+            + "<tr>"
+            + "<th scope=\"col\">Номер задачи</th>"
+            + "<th scope=\"col\">Название</th>"
+            + "<th scope=\"col\">Дата создания</th>"
+            + "<th scope=\"col\">Статус</th>"
+            + "<th scope=\"col\">Выбрать</th>"
+            + "</tr>"
+            + "</thead>"
+            + "<tbody>";
 
         for (Item item : PsqlStore.instOf().findAllItems(checkGetAll)) {
-            res = res + "<tr>" +
-                        "<td>" + item.getId() + "</td>" +
-                        "<td>" + item.getDescription() + "</td>" +
-                        "<td>" + item.getCreated() + "</td>" +
-                        "<td>" + item.getDone() + "</td>";
+            res = res + "<tr>"
+                      + "<td>" + item.getId() + "</td>"
+                      + "<td>" + item.getDescription() + "</td>"
+                      + "<td>" + item.getCreated() + "</td>"
+                      + "<td>" + item.getDone() + "</td>";
             if (item.getDone() == 0) {
                 res = res + "<td><input type=\"checkbox\" name=\"isDone\" id=\"" + item.getId() + "\"/></td>";
             } else {
