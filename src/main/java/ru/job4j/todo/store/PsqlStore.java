@@ -1,11 +1,15 @@
 package ru.job4j.todo.store;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import ru.job4j.todo.Item;
+
 import java.util.ArrayList;
+import java.util.function.Function;
 /**
  * Class PsqlStore - Хранилище в БД postgres.
  * Решение задач уровня Middle. Части 3.3. Hibernate.
@@ -20,6 +24,27 @@ public class PsqlStore implements Store, AutoCloseable {
             .configure().build();
     private final SessionFactory sf = new MetadataSources(registry)
             .buildMetadata().buildSessionFactory();
+
+    /**
+     * Method tx. Применение шаблона проектирования wrapper.
+     * @param command
+     * @param <T>
+     * @return T
+     */
+    private <T> T tx(final Function<Session, T> command) {
+        final Session session = sf.openSession();
+        final Transaction tx = session.beginTransaction();
+        try {
+            T rsl = command.apply(session);
+            tx.commit();
+            return rsl;
+        } catch (final Exception e) {
+            session.getTransaction().rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
     /**
      * Class Lazy. Экземпляр хранилища
      */
@@ -40,12 +65,12 @@ public class PsqlStore implements Store, AutoCloseable {
      */
     @Override
     public Item add(Item item) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        session.save(item);
-        session.getTransaction().commit();
-        session.close();
-        return item;
+        return this.tx(
+                session -> {
+                    session.save(item);
+                    return item;
+                }
+        );
     }
     /**
      * Method findById. Поиск по ID.
@@ -54,12 +79,9 @@ public class PsqlStore implements Store, AutoCloseable {
      */
     @Override
     public Item findById(int id) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        Item result = session.get(Item.class, id);
-        session.getTransaction().commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> session.get(Item.class, id)
+        );
     }
     /**
      * Method setDone. Перевод в состояние - Выполнена.
@@ -67,33 +89,32 @@ public class PsqlStore implements Store, AutoCloseable {
      */
     @Override
     public void setDone(int id) {
-        Session session = sf.openSession();
-        session.beginTransaction();
         Item itm = findById(id);
-        if (itm != null && itm.getDone() == 0) {
-            itm.setDone(1);
-            session.update(itm);
-        }
-        session.getTransaction().commit();
-        session.close();
+        this.tx(
+                session -> {
+                    if (itm != null && itm.getDone() == 0) {
+                        itm.setDone(1);
+                        session.update(itm);
+                    }
+                    return null;
+                }
+                );
     }
     /**
      * Method findAllItems. Получение списка текущих дел.
      * @return Дела.
      */
     @Override
-    public ArrayList<Item> findAllItems(boolean getAllState) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        ArrayList<Item> res;
-        if (getAllState) {
-            res = (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item order by 1").list();
-        } else {
-            res = (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where done = 0 order by 1").list();
-        }
-        session.getTransaction().commit();
-        session.close();
-        return res;
+    public ArrayList<Item> findAllItems(final boolean getAllState) {
+        return this.tx(
+                session -> {
+                    if (getAllState) {
+                        return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item order by 1").list();
+                    } else {
+                        return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where done = 0 order by 1").list();
+                    }
+                }
+        );
     }
     @Override
     public void close() throws Exception {
