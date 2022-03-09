@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS item (
    id INTEGER NOT NULL DEFAULT nextval('item_sq'),
    description TEXT NOT NULL,
    created TIMESTAMP DEFAULT now(),
-   done SMALLINT NOT NULL DEFAULT 0,
+   done BOOLEAN NOT NULL DEFAULT FALSE,
    CONSTRAINT pk_item PRIMARY KEY(id)
 );

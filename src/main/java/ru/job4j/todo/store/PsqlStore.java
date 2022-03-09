@@ -92,8 +92,8 @@ public class PsqlStore implements Store, AutoCloseable {
         Item itm = findById(id);
         this.tx(
                 session -> {
-                    if (itm != null && itm.getDone() == 0) {
-                        itm.setDone(1);
+                    if (itm != null && !itm.getDone()) {
+                        itm.setDone(true);
                         session.update(itm);
                     }
                     return null;
@@ -111,7 +111,7 @@ public class PsqlStore implements Store, AutoCloseable {
                     if (getAllState) {
                         return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item order by 1").list();
                     } else {
-                        return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where done = 0 order by 1").list();
+                        return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where done = false order by 1").list();
                     }
                 }
         );

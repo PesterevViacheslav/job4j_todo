@@ -24,7 +24,7 @@ public class Item {
     @Column(name = "created")
     private Timestamp created;
     @Column(name = "done")
-    private int done;
+    private boolean done;
     /**
      * Method Item. Конструктор
      * @param description Описание
@@ -32,7 +32,7 @@ public class Item {
     public Item(String description) {
         this.description = description;
         this.created = new Timestamp(System.currentTimeMillis());
-        this.done = 0;
+        this.done = false;
     }
     /**
      * Method Item. Конструктор
@@ -64,14 +64,14 @@ public class Item {
      * Method getDone. Получение статуса дела
      * @return статус
      */
-    public int getDone() {
+    public boolean getDone() {
         return done;
     }
     /**
      * Method setDone. Изменение статуса дела
      * @param done статус
      */
-    public void setDone(int done) {
+    public void setDone(boolean done) {
         this.done = done;
     }
     @Override
