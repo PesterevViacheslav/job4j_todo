@@ -8,5 +8,6 @@
 - Данные сохраняются через hibernate.
 - Для вида использован bootstrap.
 
+task_124176
 
 ![alt text](src/main/resources/todo.png "Приложение")
