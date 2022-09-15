@@ -2,6 +2,7 @@ package ru.job4j.todo.servlet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.job4j.todo.Item;
+import ru.job4j.todo.User;
 import ru.job4j.todo.store.PsqlStore;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +36,9 @@ public class ItemServlet extends HttpServlet {
         }
         resp.setContentType("application/json; charset=utf-8");
         OutputStream output = resp.getOutputStream();
-        Collection<Item> items = PsqlStore.instOf().findAllItems(checkGetAll);
+        User user = PsqlStore.instOf().findUserByUsername(req.getParameter("current_user"));
+        req.setAttribute("current_user", user.getName());
+        Collection<Item> items = PsqlStore.instOf().findAllItems(checkGetAll, user);
         String json = GSON.toJson(items);
         output.write(json.getBytes(StandardCharsets.UTF_8));
         output.flush();

@@ -1,6 +1,6 @@
 package ru.job4j.todo.store;
 import ru.job4j.todo.Item;
-
+import ru.job4j.todo.User;
 import java.util.Collection;
 /**
  * Interface Store - Хранилище.
@@ -12,8 +12,10 @@ import java.util.Collection;
  * @version 1
  */
 public interface Store {
-    Collection<Item> findAllItems(boolean getAllState);
+    Collection<Item> findAllItems(boolean getAllState, User user);
     Item add(Item item);
     void setDone(int id);
     Item findById(int id);
+    User findUserByUsername(String username);
+    User createUser(User user);
 }

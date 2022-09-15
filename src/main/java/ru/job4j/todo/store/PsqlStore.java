@@ -1,5 +1,4 @@
 package ru.job4j.todo.store;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -7,7 +6,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import ru.job4j.todo.Item;
-
+import ru.job4j.todo.User;
 import java.util.ArrayList;
 import java.util.function.Function;
 /**
@@ -105,13 +104,23 @@ public class PsqlStore implements Store, AutoCloseable {
      * @return Дела.
      */
     @Override
-    public ArrayList<Item> findAllItems(final boolean getAllState) {
+    public ArrayList<Item> findAllItems(final boolean getAllState, User user) {
         return this.tx(
                 session -> {
                     if (getAllState) {
-                        return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item order by 1").list();
+                        if (user != null) {
+                            return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where user_id = :user_id order by 1")
+                                    .setParameter("user_id", user.getId()).list();
+                        } else {
+                            return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item order by 1").list();
+                        }
                     } else {
-                        return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where done = false order by 1").list();
+                        if (user != null) {
+                            return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where user_id = :user_id and done = false order by 1")
+                                    .setParameter("user_id", user.getId()).list();
+                        } else {
+                            return (ArrayList<Item>) session.createQuery("from ru.job4j.todo.Item where done = false order by 1").list();
+                        }
                     }
                 }
         );
@@ -120,5 +129,25 @@ public class PsqlStore implements Store, AutoCloseable {
     public void close() throws Exception {
         StandardServiceRegistryBuilder.destroy(registry);
     }
+    @Override
+    public User findUserByUsername(String username) {
+        if (username != null) {
+            return (User) this.tx(
+                    session -> session.createQuery("from ru.job4j.todo.User where user_name = :usrname").setParameter("usrname", username).setMaxResults(1).uniqueResult()
+            );
+        } else {
+            return (User) this.tx(
+                    session -> session.createQuery("from ru.job4j.todo.User").setMaxResults(1).uniqueResult()
+            );
+        }
+    }
+    @Override
+    public User createUser(User user) {
+        return this.tx(
+                session -> {
+                    session.save(user);
+                    return user;
+                }
+        );
+    }
 }
-

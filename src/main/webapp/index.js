@@ -29,7 +29,7 @@ function createTr(item) {
     $('#table tbody').append(tr);
 }
 
-function getItems() {
+function getItems(pUser) {
     let chkAll;
     if ($('#checkAll').is(':checked')) {
         chkAll = 1;
@@ -41,7 +41,8 @@ function getItems() {
         type: 'POST',
         url: 'http://localhost:8080/todo/item',
         data: {
-            "all" : chkAll
+            "all" : chkAll,
+            "current_user" : pUser
         },
         dataType: 'json'
     }).done(function(data) {
@@ -54,7 +55,7 @@ function getItems() {
     return false;
 }
 
-function setDone() {
+function setDone(pUser) {
     let chkAll;
     if ($('#checkAll').is(':checked')) {
         chkAll = 1;
@@ -74,7 +75,7 @@ function setDone() {
     $.ajax({
         type: 'POST',
         url: 'http://localhost:8080/todo/item',
-        data: { "ids" : ids, "all" : chkAll},
+        data: { "ids" : ids, "all" : chkAll, "current_user" : pUser},
         dataType: 'json'
     }).done(function(data) {
         for (let item of data) {

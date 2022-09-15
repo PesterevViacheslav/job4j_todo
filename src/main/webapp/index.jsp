@@ -26,21 +26,36 @@
 
     <title>Список задач TODO</title>
 </head>
+
 <div class="container pt-3">
-    <form action="<%=request.getContextPath()%></>/index.do" method="post">
+    <div class="row">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link" href="<%=request.getContextPath()%>/user.jsp">Регистрация</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%=request.getContextPath()%>/login.jsp">| Войти</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%=request.getContextPath()%>/login.jsp"> <c:out value="${user.name}"/> | Выйти</a>
+            </li>
+        </ul>
+    </div>
+    <form action="<%=request.getContextPath()%>/index.do" method="post">
         <div class="card-header">
             Новая задача
         </div>
         <div class="form-group">
             <label>Название задачи</label>
-            <input type="text" class="form-control" name="name">
+            <input type="text" class="form-control" name="task_name">
+            <input type="hidden" name="current_user" value="${user.name}">
         </div>
 
         <label>Отображать все</label>
         <input type="checkbox" name="getAll" id="checkAll"/>
 
-        <button type="submit" class="btn btn-primary" onclick="return getItems();">Обновить список задач</button>
-        <button type="submit" class="btn btn-primary" onclick="return setDone();">Отметить выбранные задачи как
+        <button type="submit" class="btn btn-primary" onclick="return getItems('${user.name}');">Обновить список задач</button>
+        <button type="submit" class="btn btn-primary" onclick="return setDone('${user.name}');">Отметить выбранные задачи как
             выполненные
         </button>
         <button type="submit" class="btn btn-primary" onclick="return validate();">Сохранить</button>

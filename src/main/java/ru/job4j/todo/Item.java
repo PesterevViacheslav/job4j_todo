@@ -2,7 +2,6 @@ package ru.job4j.todo;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
-
 @Entity
 @Table(name = "item")
 /**
@@ -25,14 +24,23 @@ public class Item {
     private Timestamp created;
     @Column(name = "done")
     private boolean done;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     /**
      * Method Item. Конструктор
      * @param description Описание
+     * @param done Выполнено
+     * @param user Пользователь
      */
-    public Item(String description) {
-        this.description = description;
-        this.created = new Timestamp(System.currentTimeMillis());
-        this.done = false;
+    public static Item of(String description, boolean done, User user) {
+        Item item = new Item();
+        item.setDescription(description);
+        item.setCreated(new Timestamp(System.currentTimeMillis()));
+        item.setDone(done);
+        item.setUser(user);
+        return item;
     }
     /**
      * Method Item. Конструктор
@@ -52,6 +60,20 @@ public class Item {
      */
     public String getDescription() {
         return this.description;
+    }
+    /**
+     * Method setDescription. Установка комментария
+     * @param description Комментарий
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    /**
+     * Method setCreated. Установка даты создания
+     * @param created Дата создания
+     */
+    public void setCreated(Timestamp created) {
+        this.created = created;
     }
     /**
      * Method getCreated. Получение даты создания дела
@@ -74,6 +96,21 @@ public class Item {
     public void setDone(boolean done) {
         this.done = done;
     }
+    /**
+     * Method getUser. Получение ответственного для дела
+     * @return пользователь
+     */
+    public User getUser() {
+        return user;
+    }
+    /**
+     * Method setUser. Изменение ответственного для дела
+     * @param user Пользователь
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
